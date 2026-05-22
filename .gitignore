@@ -1,0 +1,5 @@
+data/zomato.csv
+__pycache__/
+*.pyc
+shap_outputs/
+notebooks/.ipynb_checkpoints/
