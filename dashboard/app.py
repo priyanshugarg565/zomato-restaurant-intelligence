@@ -53,6 +53,7 @@ feature_cols = ['online_order','book_table','votes','cost',
 
 # ── App layout ────────────────────────────────────────────────────────────────
 app = Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
+server = app.server
 
 app.layout = dbc.Container(fluid=True, children=[
 
