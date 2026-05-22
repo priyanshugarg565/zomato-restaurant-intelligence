@@ -88,7 +88,8 @@ app.layout = dbc.Container(fluid=True, children=[
         dbc.Col([html.Label("Filter by Restaurant Type", style={'color':'white'}),
             dcc.Dropdown(id='type-filter',
                 options=[{'label':'All','value':'All'}] +
-                        [{'label':t,'value':t} for t in sorted(df['rest_type'].unique())],
+                        [{'label':t,'value':t} for t in sorted(
+                            df['rest_type'].str.split(',').explode().str.strip().unique())],
                 value='All', clearable=False,
                 style={'color':'black'})], width=4),
         dbc.Col([html.Label("Min Votes", style={'color':'white'}),
@@ -216,7 +217,7 @@ app.layout = dbc.Container(fluid=True, children=[
 def filter_df(location, rest_type, min_votes):
     dff = df.copy()
     if location != 'All': dff = dff[dff['location']==location]
-    if rest_type != 'All': dff = dff[dff['rest_type']==rest_type]
+    if rest_type != 'All': dff = dff[dff['rest_type'].str.contains(rest_type, na=False)]
     dff = dff[dff['votes'] >= min_votes]
     return dff
 
