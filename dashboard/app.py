@@ -249,6 +249,32 @@ app.layout = dbc.Container(fluid=True, children=[
         ], width=12),
     ], className="mb-5"),
 
+    # ── Footer ──
+    dbc.Row(dbc.Col(html.Hr(style={'borderColor':'#444'}), className="mt-3")),
+    dbc.Row(dbc.Col(dbc.Card(dbc.CardBody([
+        dbc.Row([
+            dbc.Col([
+                html.H5("Built by Priyanshu Garg", style={'color':'#FF6B6B','fontWeight':'bold'}),
+                html.P("Final Year Dual Degree Student | IIT Kharagpur", style={'color':'white','marginBottom':'4px'}),
+                html.P("AI Micro-specialisation | Finance Head @ Kshitij", style={'color':'gray','marginBottom':'8px'}),
+                dbc.Row([
+                    dbc.Col(dbc.Button("LinkedIn", href="https://www.linkedin.com/in/priyanshuvwxyz/",
+                        target="_blank", color="primary", size="sm"), width="auto"),
+                    dbc.Col(dbc.Button("GitHub", href="https://github.com/priyanshugarg565/zomato-restaurant-intelligence",
+                        target="_blank", color="secondary", size="sm"), width="auto"),
+                    dbc.Col(html.A("priyanshugarg.iitkgp@gmail.com",
+                        href="mailto:priyanshugarg.iitkgp@gmail.com",
+                        style={'color':'#4ECDC4','lineHeight':'31px'}), width="auto"),
+                ], className="g-2"),
+            ], width=8),
+            dbc.Col([
+                html.P("📊 About this project:", style={'color':'#FF6B6B','fontWeight':'bold','marginBottom':'4px'}),
+                html.P("EDA + XGBoost model (0.9978 ROC-AUC) on 41K Bangalore restaurants. Features SHAP explainability, business recommendations engine, and live success predictor.",
+                    style={'color':'gray','fontSize':'13px'}),
+            ], width=4),
+        ])
+    ]), style={'backgroundColor':'#1a1a1a'}), className="mb-3")),
+
 ])
 
 # ── Callbacks ─────────────────────────────────────────────────────────────────
