@@ -185,7 +185,7 @@ app.layout = dbc.Container(fluid=True, children=[
     # ── Predictor ──
     dbc.Row(dbc.Col(html.H3("🔮 Restaurant Success Predictor",
         style={'color':'#FF6B6B','fontWeight':'bold'}), className="mt-2 mb-3")),
-        
+
     dbc.Row([
         dbc.Col([
             html.Label("Location", style={'color':'white'}),
@@ -316,8 +316,8 @@ def predict(n_clicks, location, rest_type, cuisine, cost, votes, online, booktab
     if not n_clicks:
         return ""
     try:
-        nearest_cost = min([200,500,800,1000,1500,2000,3000], key=lambda x: abs(x-cost))
-        nearest_votes = min([50,100,200,400,600,1000,2000], key=lambda x: abs(x-votes))
+        nearest_cost = max(100, min(3000, round(cost / 100) * 100))
+        nearest_votes = max(0, min(2000, round(votes / 50) * 50))  
         rt_key = rest_type if rest_type in key_rts else 'Casual Dining'
         cu_key = cuisine if cuisine in key_cuisines else 'North Indian'
         loc_key = location if location in key_locations else key_locations[0]
