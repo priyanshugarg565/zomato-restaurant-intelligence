@@ -235,7 +235,9 @@ app.layout = dbc.Container(fluid=True, children=[
             ]),
         ], width=12, lg=5),
         dbc.Col([
-            html.Div(id='prediction-output', style={'marginTop':'10px'})
+            dbc.Button("🔮 Predict Success", id='predict-btn',
+                color="danger", style={'width':'100%','marginBottom':'15px'}),
+            html.Div(id='prediction-output')
         ], width=12, lg=4),
     ], className="mb-5"),
 
@@ -293,14 +295,18 @@ def update_charts(location, rest_type, min_votes):
 
 @app.callback(
     Output('prediction-output','children'),
-    Input('p-location','value'),
-    Input('p-resttype','value'),
-    Input('p-cuisine','value'),
-    Input('p-cost','value'),
-    Input('p-votes','value'),
-    Input('p-online','value'),
-    Input('p-booktable','value'))
-def predict(location, rest_type, cuisine, cost, votes, online, booktable):
+    Input('predict-btn','n_clicks'),
+    State('p-location','value'),
+    State('p-resttype','value'),
+    State('p-cuisine','value'),
+    State('p-cost','value'),
+    State('p-votes','value'),
+    State('p-online','value'),
+    State('p-booktable','value'),
+    prevent_initial_call=True)
+def predict(n_clicks, location, rest_type, cuisine, cost, votes, online, booktable):
+    if not n_clicks:
+        return html.P("Set options and click Predict.", style={'color':'gray'})
     try:
         loc_enc = le_dict['location'].transform([location])[0]
         all_rest_types = le_dict['rest_type'].classes_
