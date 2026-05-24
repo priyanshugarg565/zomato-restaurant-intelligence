@@ -31,25 +31,43 @@ with open('model.pkl', 'rb') as f:
 with open('le_dict.pkl', 'rb') as f:
     le_dict = pickle.load(f)
 
-# # Encode for model
-# df_enc = df.copy()
-# le_dict = {}
-# for col in ['location','rest_type','cuisines','listing_type','listed_city']:
-#     le = LabelEncoder()
-#     df_enc[col] = le.fit_transform(df_enc[col].astype(str))
-#     le_dict[col] = le
-
-# # Train model (quick retrain)
 feature_cols = ['online_order','book_table','votes','cost',
                 'location','rest_type','cuisines','listing_type']
-# from sklearn.model_selection import train_test_split
-# X = df_enc[feature_cols]; y = df_enc['high_performer']
-# X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-# scale_pos = (y==0).sum()/(y==1).sum()
-# model = XGBClassifier(n_estimators=300, max_depth=6, learning_rate=0.05,
-#                       subsample=0.8, colsample_bytree=0.8,
-#                       scale_pos_weight=scale_pos, random_state=42, eval_metric='logloss')
-# model.fit(X_tr, y_tr, verbose=False)
+
+from itertools import product
+import warnings
+warnings.filterwarnings('ignore')
+
+print("Precomputing predictions...")
+sample_costs = [200, 500, 800, 1000, 1500, 2000, 3000]
+sample_votes = [50, 100, 200, 400, 600, 1000, 2000]
+key_locations = df['location'].value_counts().head(20).index.tolist()
+key_rts = ['Quick Bites', 'Casual Dining', 'Cafe', 'Delivery']
+key_cuisines = ['North Indian', 'Chinese', 'South Indian', 'Fast Food', 'Italian']
+
+rows = []
+keys = []
+for loc, rt, cu, online, booktable, cost, votes in product(
+        key_locations, key_rts, key_cuisines, [0,1], [0,1],
+        sample_costs, sample_votes):
+    try:
+        loc_enc = le_dict['location'].transform([loc])[0]
+        all_rt = le_dict['rest_type'].classes_
+        rt_match = next((r for r in all_rt if rt in r), all_rt[0])
+        rt_enc = le_dict['rest_type'].transform([rt_match])[0]
+        all_cu = le_dict['cuisines'].classes_
+        cu_match = next((c for c in all_cu if cu in c), all_cu[0])
+        cu_enc = le_dict['cuisines'].transform([cu_match])[0]
+        lt_enc = le_dict['listing_type'].transform(['Dine-out'])[0]
+        rows.append([online, booktable, votes, cost, loc_enc, rt_enc, cu_enc, lt_enc])
+        keys.append((loc, rt, cu, online, booktable, cost, votes))
+    except:
+        pass
+
+X_cache = pd.DataFrame(rows, columns=feature_cols)
+probs = model.predict_proba(X_cache)[:,1]
+prediction_cache = {k: float(p) for k, p in zip(keys, probs)}
+print(f"Cache ready: {len(prediction_cache)} predictions")
 
 # ── App layout ────────────────────────────────────────────────────────────────
 app = Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
@@ -322,9 +340,24 @@ def predict(n_clicks, location, rest_type, cuisine, cost, votes, online, booktab
     if not n_clicks:
         return ""
     try:
-        # Skip model entirely, just test if callback works
+        nearest_cost = min([200,500,800,1000,1500,2000,3000], key=lambda x: abs(x-cost))
+        nearest_votes = min([50,100,200,400,600,1000,2000], key=lambda x: abs(x-votes))
+        rt_key = rest_type if rest_type in key_rts else 'Casual Dining'
+        cu_key = cuisine if cuisine in key_cuisines else 'North Indian'
+        loc_key = location if location in key_locations else key_locations[0]
+        key = (loc_key, rt_key, cu_key, online, booktable, nearest_cost, nearest_votes)
+        prob = prediction_cache.get(key, 0.5)
+        label = "🟢 High Performer" if prob >= 0.5 else "🔴 Unlikely High Performer"
+        color = "#96CEB4" if prob >= 0.5 else "#FF6B6B"
         return dbc.Card(dbc.CardBody([
-            html.H4("Test - Callback Works!", style={'color':'white'}),
+            html.H4("Prediction Result", className="text-muted"),
+            html.H2(label, style={'color': color}),
+            html.H3(f"Success Probability: {prob*100:.1f}%", style={'color': color}),
+            dbc.Progress(value=prob*100,
+                        color="success" if prob>=0.5 else "danger",
+                        style={'height':'20px','marginTop':'10px'}),
+            html.P("(Based on nearest matching profile)",
+                   style={'color':'gray','fontSize':'12px','marginTop':'5px'}),
         ]), style={'backgroundColor':'#2a2a2a'})
     except Exception as e:
         return html.P(f"Error: {str(e)}", style={'color':'red'})
