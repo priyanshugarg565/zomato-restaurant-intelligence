@@ -192,53 +192,67 @@ app.layout = dbc.Container(fluid=True, children=[
     dbc.Row(dbc.Col(html.Div(id='rec-output'), className="mb-5")),
 
     # ── Predictor ──
-    dbc.Row(dbc.Col(html.H3("🔮 Restaurant Success Predictor",
-        style={'color':'#FF6B6B','fontWeight':'bold'}), className="mt-2")),
-
     dbc.Row([
         dbc.Col([
             html.Label("Location", style={'color':'white'}),
             dcc.Dropdown(id='p-location',
                 options=[{'label':l,'value':l} for l in sorted(df['location'].unique())],
                 value='BTM', style={'color':'black'}),
-            html.Label("Restaurant Type", style={'color':'white','marginTop':'10px'}),
+        ], width=6, md=3),
+        dbc.Col([
+            html.Label("Restaurant Type", style={'color':'white'}),
             dcc.Dropdown(id='p-resttype',
                 options=[{'label':t,'value':t} for t in sorted(
                     df['rest_type'].str.split(',').explode().str.strip().unique())],
                 value='Casual Dining', style={'color':'black'}),
-            html.Label("Cuisine", style={'color':'white','marginTop':'10px'}),
+        ], width=6, md=3),
+        dbc.Col([
+            html.Label("Cuisine", style={'color':'white'}),
             dcc.Dropdown(id='p-cuisine',
                 options=[{'label':c,'value':c} for c in sorted(
                     df['cuisines'].str.split(',').explode().str.strip().unique())],
                 value='North Indian', style={'color':'black'}),
-        ], width=12, lg=3),
+        ], width=6, md=3),
+        dbc.Col([
+            html.Label("Online Ordering", style={'color':'white'}),
+            dcc.RadioItems(id='p-online',
+                options=[{'label':' Yes','value':1},{'label':' No','value':0}],
+                value=1, inline=True,
+                labelStyle={'color':'white','marginRight':'15px'}),
+            html.Label("Table Booking", style={'color':'white','marginTop':'5px'}),
+            dcc.RadioItems(id='p-booktable',
+                options=[{'label':' Yes','value':1},{'label':' No','value':0}],
+                value=0, inline=True,
+                labelStyle={'color':'white','marginRight':'15px'}),
+        ], width=6, md=3),
+    ], className="mb-3"),
+
+    dbc.Row([
         dbc.Col([
             html.Label("Approx Cost for Two (₹)", style={'color':'white'}),
             dcc.Slider(id='p-cost', min=100, max=3000, step=100, value=500,
                 marks={i:{'label':f'₹{i}','style':{'color':'white'}}
                        for i in range(500,3001,500)}),
-            html.Label("Expected Votes", style={'color':'white','marginTop':'20px'}),
+        ], width=12, md=6),
+        dbc.Col([
+            html.Label("Expected Votes", style={'color':'white'}),
             dcc.Slider(id='p-votes', min=0, max=2000, step=50, value=200,
                 marks={i:{'label':str(i),'style':{'color':'white'}}
                        for i in range(0,2001,400)}),
-            html.Div([
-                html.Label("Online Ordering", style={'color':'white','marginTop':'20px'}),
-                dcc.RadioItems(id='p-online',
-                    options=[{'label':' Yes','value':1},{'label':' No','value':0}],
-                    value=1, inline=True,
-                    labelStyle={'color':'white','marginRight':'15px'}),
-                html.Label("Table Booking", style={'color':'white','marginTop':'10px'}),
-                dcc.RadioItems(id='p-booktable',
-                    options=[{'label':' Yes','value':1},{'label':' No','value':0}],
-                    value=0, inline=True,
-                    labelStyle={'color':'white','marginRight':'15px'}),
-            ]),
-        ], width=12, lg=5),
+        ], width=12, md=6),
+    ], className="mb-3"),
+
+    dbc.Row([
         dbc.Col([
             dbc.Button("🔮 Predict Success", id='predict-btn',
-                color="danger", style={'width':'100%','marginBottom':'15px'}),
+                color="danger", style={'width':'100%'})
+        ], width=12),
+    ], className="mb-3"),
+
+    dbc.Row([
+        dbc.Col([
             html.Div(id='prediction-output')
-        ], width=12, lg=4),
+        ], width=12),
     ], className="mb-5"),
 
 ])
