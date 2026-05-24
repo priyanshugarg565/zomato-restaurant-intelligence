@@ -211,34 +211,32 @@ app.layout = dbc.Container(fluid=True, children=[
                 options=[{'label':c,'value':c} for c in sorted(
                     df['cuisines'].str.split(',').explode().str.strip().unique())],
                 value='North Indian', style={'color':'black'}),
-        ], width=3),
+        ], width=12, lg=3),
         dbc.Col([
             html.Label("Approx Cost for Two (₹)", style={'color':'white'}),
             dcc.Slider(id='p-cost', min=100, max=3000, step=100, value=500,
-                marks={i:{'label':f'₹{i}','style':{'color':'white'}} 
+                marks={i:{'label':f'₹{i}','style':{'color':'white'}}
                        for i in range(500,3001,500)}),
             html.Label("Expected Votes", style={'color':'white','marginTop':'20px'}),
             dcc.Slider(id='p-votes', min=0, max=2000, step=50, value=200,
-                marks={i:{'label':str(i),'style':{'color':'white'}} 
+                marks={i:{'label':str(i),'style':{'color':'white'}}
                        for i in range(0,2001,400)}),
             html.Div([
                 html.Label("Online Ordering", style={'color':'white','marginTop':'20px'}),
                 dcc.RadioItems(id='p-online',
                     options=[{'label':' Yes','value':1},{'label':' No','value':0}],
                     value=1, inline=True,
-                    style={'color':'white'},
                     labelStyle={'color':'white','marginRight':'15px'}),
                 html.Label("Table Booking", style={'color':'white','marginTop':'10px'}),
                 dcc.RadioItems(id='p-booktable',
                     options=[{'label':' Yes','value':1},{'label':' No','value':0}],
                     value=0, inline=True,
-                    style={'color':'white'},
                     labelStyle={'color':'white','marginRight':'15px'}),
             ]),
-        ], width=5),
+        ], width=12, lg=5),
         dbc.Col([
             html.Div(id='prediction-output', style={'marginTop':'10px'})
-        ], width=4),
+        ], width=12, lg=4),
     ], className="mb-5"),
 
 ])
