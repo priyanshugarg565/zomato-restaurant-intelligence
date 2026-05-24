@@ -320,35 +320,14 @@ def update_charts(location, rest_type, min_votes):
     prevent_initial_call=True)
 def predict(n_clicks, location, rest_type, cuisine, cost, votes, online, booktable):
     if not n_clicks:
-        return html.P("Set options and click Predict.", style={'color':'gray'})
+        return ""
     try:
-        loc_enc = le_dict['location'].transform([location])[0]
-        all_rest_types = le_dict['rest_type'].classes_
-        rt_match = next((r for r in all_rest_types if rest_type in r), all_rest_types[0])
-        rt_enc = le_dict['rest_type'].transform([rt_match])[0]
-        # cu_enc  = le_dict['cuisines'].transform([cuisine])[0]
-        # Find closest match in training data
-        all_cuisines = le_dict['cuisines'].classes_
-        match = next((c for c in all_cuisines if cuisine in c), all_cuisines[0])
-        cu_enc = le_dict['cuisines'].transform([match])[0]
-        lt_enc  = le_dict['listing_type'].transform(['Dine-out'])[0]
-
-        X_input = pd.DataFrame([[online, booktable, votes, cost,
-                                  loc_enc, rt_enc, cu_enc, lt_enc]],
-                               columns=feature_cols)
-        prob = model.predict_proba(X_input)[0][1]
-        label = "🟢 High Performer" if prob >= 0.5 else "🔴 Unlikely High Performer"
-        color = "#96CEB4" if prob >= 0.5 else "#FF6B6B"
-
+        # Skip model entirely, just test if callback works
         return dbc.Card(dbc.CardBody([
-            html.H4("Prediction Result", className="text-muted"),
-            html.H2(label, style={'color': color}),
-            html.H3(f"Success Probability: {prob*100:.1f}%", style={'color': color}),
-            dbc.Progress(value=prob*100, color="success" if prob>=0.5 else "danger",
-                        style={'height':'20px','marginTop':'10px'}),
+            html.H4("Test - Callback Works!", style={'color':'white'}),
         ]), style={'backgroundColor':'#2a2a2a'})
     except Exception as e:
-        return html.P(f"Select valid options to predict. ({e})", style={'color':'gray'})
+        return html.P(f"Error: {str(e)}", style={'color':'red'})
 
 @app.callback(
     Output('rec-output','children'),
