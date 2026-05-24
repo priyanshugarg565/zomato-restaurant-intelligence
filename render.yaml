@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: zomato-dashboard
+    runtime: python
+    rootDir: dashboard
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:server -c gunicorn_config.py
