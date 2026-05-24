@@ -94,7 +94,7 @@ app.layout = dbc.Container(fluid=True, children=[
                 style={'color':'black'})], width=4),
         dbc.Col([html.Label("Min Votes", style={'color':'white'}),
             dcc.Slider(id='votes-filter', min=0, max=500, step=50, value=0,
-                marks={i:str(i) for i in range(0,501,100)})], width=4),
+                marks={i:{'label':str(i),'style':{'color':'white'}} for i in range(0,501,100)})], width=4),
     ], className="mb-4"),
 
     # ── Charts Row 1 ──
@@ -150,7 +150,7 @@ app.layout = dbc.Container(fluid=True, children=[
         dbc.Col([
             html.Label("My budget for two (₹):", style={'color':'white'}),
             dcc.Slider(id='rec-budget', min=200, max=2000, step=100, value=800,
-                marks={i:f'₹{i}' for i in range(200,2001,400)}),
+                marks={i:{'label':f'₹{i}','style':{'color':'white'}} for i in range(200,2001,400)}),
         ], width=4),
         dbc.Col([
             html.Label("Restaurant type:", style={'color':'white'}),
@@ -180,7 +180,8 @@ app.layout = dbc.Container(fluid=True, children=[
                 value='BTM', style={'color':'black'}),
             html.Label("Restaurant Type", style={'color':'white','marginTop':'10px'}),
             dcc.Dropdown(id='p-resttype',
-                options=[{'label':t,'value':t} for t in sorted(df['rest_type'].unique())],
+                options=[{'label':t,'value':t} for t in sorted(
+                    df['rest_type'].str.split(',').explode().str.strip().unique())],
                 value='Casual Dining', style={'color':'black'}),
             html.Label("Cuisine", style={'color':'white','marginTop':'10px'}),
             dcc.Dropdown(id='p-cuisine',
@@ -191,23 +192,29 @@ app.layout = dbc.Container(fluid=True, children=[
         dbc.Col([
             html.Label("Approx Cost for Two (₹)", style={'color':'white'}),
             dcc.Slider(id='p-cost', min=100, max=3000, step=100, value=500,
-                marks={i:f'₹{i}' for i in range(0,3001,500)}),
+                marks={i:{'label':f'₹{i}','style':{'color':'white'}} 
+                       for i in range(500,3001,500)}),
             html.Label("Expected Votes", style={'color':'white','marginTop':'20px'}),
             dcc.Slider(id='p-votes', min=0, max=2000, step=50, value=200,
-                marks={i:str(i) for i in range(0,2001,400)}),
+                marks={i:{'label':str(i),'style':{'color':'white'}} 
+                       for i in range(0,2001,400)}),
             html.Div([
                 html.Label("Online Ordering", style={'color':'white','marginTop':'20px'}),
                 dcc.RadioItems(id='p-online',
                     options=[{'label':' Yes','value':1},{'label':' No','value':0}],
-                    value=1, inline=True, style={'color':'white'}),
+                    value=1, inline=True,
+                    style={'color':'white'},
+                    labelStyle={'color':'white','marginRight':'15px'}),
                 html.Label("Table Booking", style={'color':'white','marginTop':'10px'}),
                 dcc.RadioItems(id='p-booktable',
                     options=[{'label':' Yes','value':1},{'label':' No','value':0}],
-                    value=0, inline=True, style={'color':'white'}),
+                    value=0, inline=True,
+                    style={'color':'white'},
+                    labelStyle={'color':'white','marginRight':'15px'}),
             ]),
         ], width=5),
         dbc.Col([
-            html.Div(id='prediction-output', style={'marginTop':'30px'})
+            html.Div(id='prediction-output', style={'marginTop':'10px'})
         ], width=4),
     ], className="mb-5"),
 
@@ -275,7 +282,9 @@ def update_charts(location, rest_type, min_votes):
 def predict(location, rest_type, cuisine, cost, votes, online, booktable):
     try:
         loc_enc = le_dict['location'].transform([location])[0]
-        rt_enc  = le_dict['rest_type'].transform([rest_type])[0]
+        all_rest_types = le_dict['rest_type'].classes_
+        rt_match = next((r for r in all_rest_types if rest_type in r), all_rest_types[0])
+        rt_enc = le_dict['rest_type'].transform([rt_match])[0]
         # cu_enc  = le_dict['cuisines'].transform([cuisine])[0]
         # Find closest match in training data
         all_cuisines = le_dict['cuisines'].classes_
