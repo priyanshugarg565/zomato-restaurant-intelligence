@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import Dash, dcc, html, Input, Output
+from dash import Dash, dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 from sklearn.preprocessing import LabelEncoder
 from xgboost import XGBClassifier
@@ -333,11 +333,13 @@ def predict(location, rest_type, cuisine, cost, votes, online, booktable):
 @app.callback(
     Output('rec-output','children'),
     Input('rec-btn','n_clicks'),
-    Input('rec-location','value'),
-    Input('rec-budget','value'),
-    Input('rec-type','value'),
-    prevent_initial_call=False)
+    State('rec-location','value'),
+    State('rec-budget','value'),
+    State('rec-type','value'),
+    prevent_initial_call=True)
 def get_recommendations(n_clicks, location, budget, rest_type):
+    if not n_clicks:
+        return html.P("Select options and click Get Recommendations.", style={'color':'gray'})
     dff = df[df['location']==location].copy()
     dff = dff[dff['cost'] <= budget]
     if rest_type != 'Any':
