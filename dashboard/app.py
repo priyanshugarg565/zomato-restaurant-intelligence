@@ -55,6 +55,29 @@ feature_cols = ['online_order','book_table','votes','cost',
 app = Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 server = app.server
 
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>Zomato Restaurant Intelligence</title>
+        {%favicon%}
+        {%css%}
+        <style>
+            .rc-slider-handle { border-color: #FF6B6B !important; }
+            input[type=number] { background-color: #333 !important; color: white !important; border: 1px solid #555 !important; }
+            .dash-slider-input { background-color: #333 !important; color: white !important; }
+        </style>
+    </head>
+    <body>
+        {%app_entry%}
+        {%config%}
+        {%scripts%}
+        {%renderer%}
+    </body>
+</html>
+'''
+
 app.layout = dbc.Container(fluid=True, children=[
 
     dbc.Row(dbc.Col(html.H1("🍽️ Zomato Bangalore Restaurant Intelligence",
