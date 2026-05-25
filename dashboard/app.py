@@ -13,18 +13,6 @@ import io
 
 # ── Load & prep data ──────────────────────────────────────────────────────────
 df = pd.read_csv('df_clean.csv')
-# df.drop(columns=['url','address','phone','reviews_list','menu_item'], inplace=True)
-# df.drop_duplicates(inplace=True)
-# df['rate'] = pd.to_numeric(df['rate'].astype(str).str.replace('/5','').str.strip(), errors='coerce')
-# df['approx_cost(for two people)'] = pd.to_numeric(
-#     df['approx_cost(for two people)'].astype(str).str.replace(',','').str.strip(), errors='coerce')
-# df.rename(columns={'approx_cost(for two people)':'cost',
-#                    'listed_in(type)':'listing_type',
-#                    'listed_in(city)':'listed_city'}, inplace=True)
-# df['online_order'] = (df['online_order']=='Yes').astype(int)
-# df['book_table']   = (df['book_table']=='Yes').astype(int)
-# df.dropna(subset=['rate','cost','location','cuisines','rest_type'], inplace=True)
-# df['high_performer'] = ((df['rate']>=4.0) & (df['votes']>=200)).astype(int)
 
 with open('model.pkl', 'rb') as f:
     model = pickle.load(f)
@@ -71,7 +59,7 @@ app.index_string = '''
 
 app.layout = dbc.Container(fluid=True, children=[
 
-    dbc.Row(dbc.Col(html.H1("🍽️ Zomato Bangalore Restaurant Intelligence",
+    dbc.Row(dbc.Col(html.H1("Zomato Bangalore Restaurant Intelligence",
         className="text-center my-3",
         style={'color':'#FF6B6B','fontWeight':'bold','fontSize':'2rem'}))),
 
@@ -124,7 +112,7 @@ app.layout = dbc.Container(fluid=True, children=[
     ], className="mb-3"),
 
     # ── SHAP Section ──
-    dbc.Row(dbc.Col(html.H3("🧠 Model Explainability (SHAP)",
+    dbc.Row(dbc.Col(html.H3("Model Explainability (SHAP)",
         style={'color':'#FF6B6B','fontWeight':'bold'}), className="mt-2 mb-3")),
 
     dbc.Row([
@@ -141,7 +129,7 @@ app.layout = dbc.Container(fluid=True, children=[
     ], className="mb-4"),
 
     dbc.Row(dbc.Col(dbc.Card(dbc.CardBody([
-        html.H5("🔍 How to read this:", style={'color':'#FF6B6B'}),
+        html.H5("How to read this:", style={'color':'#FF6B6B'}),
         html.Ul([
             html.Li("votes is the dominant predictor — 10x more important than any other feature", style={'color':'white'}),
             html.Li("book_table = Yes strongly increases success probability", style={'color':'white'}),
@@ -151,7 +139,7 @@ app.layout = dbc.Container(fluid=True, children=[
     ]), style={'backgroundColor':'#2a2a2a'}), className="mb-4")),
 
     # ── Business Recommendations ──
-    dbc.Row(dbc.Col(html.H3("💡 Business Recommendations Engine",
+    dbc.Row(dbc.Col(html.H3("Business Recommendations Engine",
         style={'color':'#FF6B6B','fontWeight':'bold'}), className="mt-2 mb-3")),
 
     dbc.Row([
@@ -183,7 +171,7 @@ app.layout = dbc.Container(fluid=True, children=[
     dbc.Row(dbc.Col(html.Div(id='rec-output'), className="mb-5")),
 
     # ── Predictor ──
-    dbc.Row(dbc.Col(html.H3("🔮 Restaurant Success Predictor",
+    dbc.Row(dbc.Col(html.H3("Restaurant Success Predictor",
         style={'color':'#FF6B6B','fontWeight':'bold'}), className="mt-2 mb-3")),
 
     dbc.Row([
@@ -238,7 +226,7 @@ app.layout = dbc.Container(fluid=True, children=[
 
     dbc.Row([
         dbc.Col([
-            dbc.Button("🔮 Predict Success", id='predict-btn',
+            dbc.Button("Predict Success", id='predict-btn',
                 color="danger", style={'width':'100%'})
         ], width=12),
     ], className="mb-3"),
@@ -268,7 +256,7 @@ app.layout = dbc.Container(fluid=True, children=[
                 ], className="g-2"),
             ], width=8),
             dbc.Col([
-                html.P("📊 About this project:", style={'color':'#FF6B6B','fontWeight':'bold','marginBottom':'4px'}),
+                html.P("About this project:", style={'color':'#FF6B6B','fontWeight':'bold','marginBottom':'4px'}),
                 html.P("EDA + XGBoost model (0.9978 ROC-AUC) on 41K Bangalore restaurants. Features SHAP explainability, business recommendations engine, and live success predictor.",
                     style={'color':'gray','fontSize':'13px'}),
             ], width=4),
@@ -408,7 +396,7 @@ def get_recommendations(n_clicks, location, budget, rest_type):
     return dbc.Row([
         # Market overview
         dbc.Col(dbc.Card(dbc.CardBody([
-            html.H5(f"📊 Market Overview: {location}", style={'color':'#FF6B6B'}),
+            html.H5(f"Market Overview: {location}", style={'color':'#FF6B6B'}),
             html.P(f"Restaurants in budget: {competition}", style={'color':'white'}),
             html.P(f"Avg rating in area: {avg_rating:.2f} ⭐", style={'color':'white'}),
             html.P(f"High performer rate: {hp_pct:.1f}%", style={'color':'white'}),
@@ -422,7 +410,7 @@ def get_recommendations(n_clicks, location, budget, rest_type):
 
         # Top competitors
         dbc.Col(dbc.Card(dbc.CardBody([
-            html.H5(f"🔍 Top Competitors to Study:", style={'color':'#FF6B6B'}),
+            html.H5(f"Top Competitors to Study:", style={'color':'#FF6B6B'}),
             html.Table([
                 html.Thead(html.Tr([
                     html.Th("Restaurant", style={'color':'#4ECDC4'}),
@@ -441,7 +429,7 @@ def get_recommendations(n_clicks, location, budget, rest_type):
 
         # Actionable insight
         dbc.Col(dbc.Card(dbc.CardBody([
-            html.H5("🎯 Key Insight:", style={'color':'#FF6B6B'}),
+            html.H5("Key Insight:", style={'color':'#FF6B6B'}),
             html.P(
                 f"In {location} under ₹{budget}, "
                 f"'{cuisine_stats.iloc[0]['cuisine'] if len(cuisine_stats)>0 else 'N/A'}' "
