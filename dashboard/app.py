@@ -244,7 +244,7 @@ app.layout = dbc.Container(fluid=True, children=[
             dbc.Col([
                 html.H5("Built by Priyanshu Garg", style={'color':'#FF6B6B','fontWeight':'bold'}),
                 html.P("Final Year Dual Degree Student | IIT Kharagpur", style={'color':'white','marginBottom':'4px'}),
-                html.P("AI Micro-specialisation | Finance Head @ Kshitij", style={'color':'gray','marginBottom':'8px'}),
+                html.P("Product Analyst @ Inito", style={'color':'gray','marginBottom':'8px'}),
                 dbc.Row([
                     dbc.Col(dbc.Button("LinkedIn", href="https://www.linkedin.com/in/priyanshuvwxyz/",
                         target="_blank", color="primary", size="sm"), width="auto"),
