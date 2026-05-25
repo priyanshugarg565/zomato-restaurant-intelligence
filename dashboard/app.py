@@ -326,19 +326,33 @@ def update_charts(location, rest_type, min_votes):
     State('p-online','value'),
     State('p-booktable','value'),
     prevent_initial_call=True)
+
 def predict(n_clicks, location, rest_type, cuisine, cost, votes, online, booktable):
     if not n_clicks:
         return ""
     try:
         nearest_cost = max(100, min(3000, round(cost / 100) * 100))
-        nearest_votes = max(0, min(2000, round(votes / 50) * 50))  
+        nearest_votes = max(0, min(2000, round(votes / 50) * 50))
         rt_key = rest_type if rest_type in key_rts else 'Casual Dining'
         cu_key = cuisine if cuisine in key_cuisines else 'North Indian'
         loc_key = location if location in key_locations else key_locations[0]
+
+        # Build fallback notes
+        notes = []
+        if rest_type not in key_rts:
+            notes.append(f"'{rest_type}' → 'Casual Dining'")
+        if cuisine not in key_cuisines:
+            notes.append(f"'{cuisine}' → 'North Indian'")
+        if location not in key_locations:
+            notes.append(f"'{location}' → '{key_locations[0]}'")
+        note_text = "⚠️ Approximated: " + ", ".join(notes) if notes else "✓ Exact match from model cache"
+        note_color = "#FFA500" if notes else "#96CEB4"
+
         key = (loc_key, rt_key, cu_key, online, booktable, nearest_cost, nearest_votes)
         prob = prediction_cache.get(key, 0.5)
         label = "🟢 High Performer" if prob >= 0.5 else "🔴 Unlikely High Performer"
         color = "#96CEB4" if prob >= 0.5 else "#FF6B6B"
+
         return dbc.Card(dbc.CardBody([
             html.H4("Prediction Result", className="text-muted"),
             html.H2(label, style={'color': color}),
@@ -346,8 +360,7 @@ def predict(n_clicks, location, rest_type, cuisine, cost, votes, online, booktab
             dbc.Progress(value=prob*100,
                         color="success" if prob>=0.5 else "danger",
                         style={'height':'20px','marginTop':'10px'}),
-            html.P("(Based on nearest matching profile)",
-                   style={'color':'gray','fontSize':'12px','marginTop':'5px'}),
+            html.P(note_text, style={'color': note_color, 'fontSize':'12px', 'marginTop':'5px'}),
         ]), style={'backgroundColor':'#2a2a2a'})
     except Exception as e:
         return html.P(f"Error: {str(e)}", style={'color':'red'})

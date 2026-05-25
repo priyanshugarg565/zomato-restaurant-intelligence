@@ -14,7 +14,11 @@ feature_cols = ['online_order','book_table','votes','cost','location','rest_type
 sample_costs = list(range(100, 3001, 100))   # 30 points - keep this
 sample_votes = [0, 50, 100, 150, 200, 300, 400, 500, 750, 1000, 1500, 2000]  # 12 points instead of 41
 key_locations = df['location'].value_counts().head(20).index.tolist()
-key_rts = ['Quick Bites', 'Casual Dining', 'Cafe', 'Delivery']
+key_rts = sorted(df['rest_type'].str.split(',').explode().str.strip().unique().tolist())
+# Top 30 cuisines by count
+key_cuisines = (df['cuisines'].str.split(',').explode().str.strip().value_counts().head(30).index.tolist())
+print(f"Rest types: {len(key_rts)}")
+print(f"Cuisines: {len(key_cuisines)}")
 key_cuisines = ['North Indian', 'Chinese', 'South Indian', 'Fast Food', 'Italian']
 
 all_combos = list(product(key_locations, key_rts, key_cuisines, [0,1], [0,1], sample_costs, sample_votes))
